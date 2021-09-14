@@ -1,11 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#Takes a directory in log_files as a command line argument and does all its work in that directory.
+#cd into the directory and go into its subdirectories or exit if the cd failed
+cd "$1"/var/log || exit
 
-#Moves to the specified directory.
-cd "$1"
+#Concatenate all files in the directory
+#pipe cat into an awk command
+#then pipe that into a sed command
+#then print to failed_login_data.txt
+cat ./* | awk 'match("$0", /([a-zA-Z0-9]) Failed password ([a-zA-Z0-9.])/, groups) {print groups[1] groups[2]}' >  failed_login_data.txt
 
-#Combines all the text files in the specified directory.
-cat /var/log/* > logs.txt
 
-awk 'match("$0", /([a-zA-Z0-9:[])/: Failed password for /([a-zA-Z0-9\.])/, groups) {print groups[1] groups[2]}'<logs.txt>output.txt
+#Move the failed_login_data.txt file back into directory stored in the directory variable
+mv failed_login_data.txt ../../
